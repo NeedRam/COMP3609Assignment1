@@ -1,6 +1,4 @@
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
@@ -21,7 +19,6 @@ public class Alien extends Thread {
 
    private int pointValue;	// points awarded when destroyed
 
-   private Color backgroundColour;
    private Dimension dimension;
 
    boolean isRunning;
@@ -33,7 +30,6 @@ public class Alien extends Thread {
    public Alien (JPanel p, int xPos, int yPos, int alienTier) {
       panel = p;
       dimension = panel.getSize();
-      backgroundColour = panel.getBackground ();
 
       x = xPos;
       y = yPos;
@@ -75,25 +71,8 @@ public class Alien extends Thread {
    }
 
 
-   public void draw () {
-      Graphics g = panel.getGraphics ();
-      Graphics2D g2 = (Graphics2D) g;
-  
+   public void draw (Graphics2D g2) {
       g2.drawImage(alienImage, x, y, width, height, null);
-
-      g.dispose();
-   }
-
-
-   public void erase () {
-      Graphics g = panel.getGraphics ();
-      Graphics2D g2 = (Graphics2D) g;
-
-      // erase alien by drawing a rectangle on top of it
-      g2.setColor (backgroundColour);
-      g2.fill (new Rectangle2D.Double (x, y, width, height));
-
-      g.dispose();
    }
 
 

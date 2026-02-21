@@ -37,6 +37,7 @@ public class GameWindow extends JFrame
 
 	private Timer gameTimer;
 	private Timer alienFireTimer;
+	private Timer movementTimer;  // Timer for smooth player movement
 
 	@SuppressWarnings({"unchecked"})
 	public GameWindow() {
@@ -170,6 +171,16 @@ public class GameWindow extends JFrame
 				}
 			}
 		});
+
+		// Create timer for smooth player movement (updates based on key state)
+		movementTimer = new Timer(30, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (gamePanel.isGameRunning() && !gamePanel.isGamePaused()) {
+					gamePanel.updatePlayerMovement();
+				}
+			}
+		});
 	}
 
 
@@ -186,6 +197,7 @@ public class GameWindow extends JFrame
 			gamePanel.drawGameEntities();
 			gameTimer.start();
 			alienFireTimer.start();
+			movementTimer.start();
 			mainPanel.requestFocus();
 		}
 
@@ -195,11 +207,13 @@ public class GameWindow extends JFrame
 				pauseB.setText("Resume");
 				gameTimer.stop();
 				alienFireTimer.stop();
+				movementTimer.stop();
 			}
 			else {
 				pauseB.setText("Pause");
 				gameTimer.start();
 				alienFireTimer.start();
+				movementTimer.start();
 			}
 			mainPanel.requestFocus();
 		}
@@ -217,13 +231,11 @@ public class GameWindow extends JFrame
 		int keyCode = e.getKeyCode();
 
 		if (keyCode == KeyEvent.VK_RIGHT) {
-			gamePanel.updateGameEntities(2);
-			gamePanel.drawGameEntities();
+			gamePanel.setRightKeyPressed(true);
 		}
 
 		if (keyCode == KeyEvent.VK_LEFT) {
-			gamePanel.updateGameEntities(1);
-			gamePanel.drawGameEntities();
+			gamePanel.setLeftKeyPressed(true);
 		}
 
 		if (keyCode == KeyEvent.VK_SPACE) {
@@ -232,7 +244,15 @@ public class GameWindow extends JFrame
 	}
 
 	public void keyReleased(KeyEvent e) {
+		int keyCode = e.getKeyCode();
 
+		if (keyCode == KeyEvent.VK_RIGHT) {
+			gamePanel.setRightKeyPressed(false);
+		}
+
+		if (keyCode == KeyEvent.VK_LEFT) {
+			gamePanel.setLeftKeyPressed(false);
+		}
 	}
 
 	public void keyTyped(KeyEvent e) {

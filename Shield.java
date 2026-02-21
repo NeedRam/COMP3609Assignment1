@@ -14,7 +14,6 @@ public class Shield {
    private int width;
    private int height;
 
-   private Color backgroundColour;
    private Dimension dimension;
 
    private ArrayList<Rectangle2D.Double> blocks;
@@ -26,7 +25,6 @@ public class Shield {
    public Shield (JPanel p, int xPos, int yPos) {
       panel = p;
       dimension = panel.getSize();
-      backgroundColour = panel.getBackground ();
 
       x = xPos;
       y = yPos;
@@ -69,10 +67,7 @@ public class Shield {
    }
 
 
-   public void draw () {
-      Graphics g = panel.getGraphics ();
-      Graphics2D g2 = (Graphics2D) g;
-
+   public void draw (Graphics2D g2) {
       g2.setColor(Color.GREEN);
 
       for (int i = 0; i < blocks.size(); i++) {
@@ -80,24 +75,6 @@ public class Shield {
             g2.fill(blocks.get(i));
          }
       }
-
-      g.dispose();
-   }
-
-
-   public void erase () {
-      Graphics g = panel.getGraphics ();
-      Graphics2D g2 = (Graphics2D) g;
-
-      g2.setColor (backgroundColour);
-
-      for (int i = 0; i < blocks.size(); i++) {
-         if (blockActive.get(i)) {
-            g2.fill(blocks.get(i));
-         }
-      }
-
-      g.dispose();
    }
 
 

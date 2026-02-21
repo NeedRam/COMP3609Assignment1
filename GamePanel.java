@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
    A component that displays all the game entities
-*/
+ */
 
 public class GamePanel extends JPanel {
    
@@ -27,6 +27,10 @@ public class GamePanel extends JPanel {
    private boolean gameRunning;
    private boolean gamePaused;
 
+   // Key state tracking for smooth movement
+   private boolean leftKeyPressed;
+   private boolean rightKeyPressed;
+
    public GamePanel () {
       player = null;
       alienSwarm = null;
@@ -40,9 +44,13 @@ public class GamePanel extends JPanel {
       gameRunning = false;
       gamePaused = false;
 
+      leftKeyPressed = false;
+      rightKeyPressed = false;
+
       backgroundImage = ImageManager.loadImage("spaceBackground.jpg");
 
       setBackground(Color.BLACK);
+      setDoubleBuffered(true);  // Enable double buffering
    }
 
 
@@ -74,44 +82,41 @@ public class GamePanel extends JPanel {
 
 
    public void drawGameEntities() {
-       // Draw player
-       if (player != null) {
-           player.draw();
-       }
-
-       // Draw alien swarm
-       if (alienSwarm != null) {
-           alienSwarm.drawAll();
-       }
-
-       // Draw shields
-       for (Shield shield : shields) {
-           shield.draw();
-       }
-
-       // Draw player bullets
-       for (Bullet bullet : playerBullets) {
-           if (bullet.isActive()) {
-               bullet.draw();
-           }
-       }
-
-       // Draw alien bullets
-       for (Bullet bullet : alienBullets) {
-           if (bullet.isActive()) {
-               bullet.draw();
-           }
-       }
-   }
+        // With double-buffering, we just request a repaint
+        repaint();
+    }
 
 
-   public void updateGameEntities(int direction) {
-       if (player == null)
-          return;
+    public void updateGameEntities(int direction) {
+        if (player == null)
+           return;
 
-       player.erase();
-       player.move(direction);
-   }
+        player.move(direction);
+        repaint();
+    }
+
+
+    public void updatePlayerMovement() {
+        if (player == null || !gameRunning || gamePaused)
+           return;
+
+        if (leftKeyPressed && !rightKeyPressed) {
+           player.move(1);  // move left
+        }
+        else if (rightKeyPressed && !leftKeyPressed) {
+           player.move(2);  // move right
+        }
+    }
+
+
+    public void setLeftKeyPressed(boolean pressed) {
+        leftKeyPressed = pressed;
+    }
+
+
+    public void setRightKeyPressed(boolean pressed) {
+        rightKeyPressed = pressed;
+    }
 
 
    public void startGame() {
@@ -201,107 +206,102 @@ public class GamePanel extends JPanel {
 
 
    public void checkCollisions() {
-      if (!gameRunning || gamePaused)
-         return;
+       if (!gameRunning || gamePaused)
+          return;
 
-      // Check player bullets vs aliens
-      for (int i = playerBullets.size() - 1; i >= 0; i--) {
-          Bullet bullet = playerBullets.get(i);
-          if (!bullet.isActive()) {
-              playerBullets.remove(i);
-              continue;
-          }
+       // Check player bullets vs aliens
+       for (int i = playerBullets.size() - 1; i >= 0; i--) {
+           Bullet bullet = playerBullets.get(i);
+           if (!bullet.isActive()) {
+               playerBullets.remove(i);
+               continue;
+           }
 
-          Rectangle2D.Double bulletRect = bullet.getBoundingRectangle();
+           Rectangle2D.Double bulletRect = bullet.getBoundingRectangle();
 
-          // Check collision with aliens
-          ArrayList<Alien> aliens = alienSwarm.getAliens();
-          for (int j = aliens.size() - 1; j >= 0; j--) {
-              Alien alien = aliens.get(j);
-              if (bulletRect.intersects(alien.getBoundingRectangle())) {
-                  // Hit!
-                  bullet.setActive(false);
-                  bullet.erase();
-                  alien.erase();
-                  alienSwarm.removeAlien(alien);
+           // Check collision with aliens
+           ArrayList<Alien> aliens = alienSwarm.getAliens();
+           for (int j = aliens.size() - 1; j >= 0; j--) {
+               Alien alien = aliens.get(j);
+               if (bulletRect.intersects(alien.getBoundingRectangle())) {
+                   // Hit!
+                   bullet.setActive(false);
+                   alienSwarm.removeAlien(alien);
 
-                  scoreManager.addScore(alien.getPointValue());
-                  soundManager.playClip("explosion", false);
+                   scoreManager.addScore(alien.getPointValue());
+                   soundManager.playClip("explosion", false);
 
-                  playerBullets.remove(i);
-                  break;
-              }
-          }
+                   playerBullets.remove(i);
+                   break;
+               }
+           }
 
-          // Check collision with shields
-          for (Shield shield : shields) {
-              if (shield.checkHit(bulletRect)) {
-                  bullet.setActive(false);
-                  bullet.erase();
-                  playerBullets.remove(i);
-                  break;
-              }
-          }
-      }
+           // Check collision with shields
+           for (Shield shield : shields) {
+               if (shield.checkHit(bulletRect)) {
+                   bullet.setActive(false);
+                   playerBullets.remove(i);
+                   break;
+               }
+           }
+       }
 
-      // Check alien bullets vs player
-      for (int i = alienBullets.size() - 1; i >= 0; i--) {
-          Bullet bullet = alienBullets.get(i);
-          if (!bullet.isActive()) {
-              alienBullets.remove(i);
-              continue;
-          }
+       // Check alien bullets vs player
+       for (int i = alienBullets.size() - 1; i >= 0; i--) {
+           Bullet bullet = alienBullets.get(i);
+           if (!bullet.isActive()) {
+               alienBullets.remove(i);
+               continue;
+           }
 
-          Rectangle2D.Double bulletRect = bullet.getBoundingRectangle();
+           Rectangle2D.Double bulletRect = bullet.getBoundingRectangle();
 
-          // Check collision with player
-          if (player != null && bulletRect.intersects(player.getBoundingRectangle())) {
-              bullet.setActive(false);
-              bullet.erase();
-              alienBullets.remove(i);
+           // Check collision with player
+           if (player != null && bulletRect.intersects(player.getBoundingRectangle())) {
+               bullet.setActive(false);
+               alienBullets.remove(i);
 
-              scoreManager.loseLife();
-              soundManager.playClip("playerHit", false);
+               scoreManager.loseLife();
+               soundManager.playClip("playerHit", false);
 
-              if (scoreManager.isGameOver()) {
-                  stopGame();
-              }
-              continue;
-          }
+               if (scoreManager.isGameOver()) {
+                   stopGame();
+               }
+               continue;
+           }
 
-          // Check collision with shields
-          for (Shield shield : shields) {
-              if (shield.checkHit(bulletRect)) {
-                  bullet.setActive(false);
-                  bullet.erase();
-                  alienBullets.remove(i);
-                  break;
-              }
-          }
-      }
+           // Check collision with shields
+           for (Shield shield : shields) {
+               if (shield.checkHit(bulletRect)) {
+                   bullet.setActive(false);
+                   alienBullets.remove(i);
+                   break;
+               }
+           }
+       }
 
-      // Check if aliens reached bottom
-      if (alienSwarm != null && alienSwarm.checkBottomCollision(getHeight())) {
-          scoreManager.loseLife();
-          if (scoreManager.isGameOver()) {
-              stopGame();
-          }
-          else {
-              // Reset level
-              alienSwarm.stopRunning();
-              createGameEntities();
-              alienSwarm.start();
-          }
-      }
+       // Check if aliens reached bottom
+       if (alienSwarm != null && alienSwarm.checkBottomCollision(getHeight())) {
+           scoreManager.loseLife();
+           if (scoreManager.isGameOver()) {
+               stopGame();
+           }
+           else {
+               // Reset level
+               alienSwarm.stopRunning();
+               createGameEntities();
+               alienSwarm.start();
+           }
+       }
 
-      // Check if all aliens destroyed (level complete)
-      if (alienSwarm != null && alienSwarm.isEmpty()) {
-          scoreManager.nextLevel();
-          alienSwarm.stopRunning();
-          createGameEntities();
-          alienSwarm.start();
-      }
-   }
+       // Check if all aliens destroyed (level complete)
+       if (alienSwarm != null && alienSwarm.isEmpty()) {
+           scoreManager.nextLevel();
+           alienSwarm.stopRunning();
+           createGameEntities();
+           alienSwarm.start();
+       }
+    }
 
 
    @Override
@@ -312,6 +312,40 @@ public class GamePanel extends JPanel {
       // Draw background image
       if (backgroundImage != null) {
           g2.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
+      }
+
+      // Draw all game entities on top of background
+      if (!gameRunning) {
+          return;
+      }
+
+      // Draw shields
+      for (Shield shield : shields) {
+          shield.draw(g2);
+      }
+
+      // Draw player
+      if (player != null) {
+          player.draw(g2);
+      }
+
+      // Draw alien swarm
+      if (alienSwarm != null) {
+          alienSwarm.drawAll(g2);
+      }
+
+      // Draw player bullets
+      for (Bullet bullet : playerBullets) {
+          if (bullet.isActive()) {
+              bullet.draw(g2);
+          }
+      }
+
+      // Draw alien bullets
+      for (Bullet bullet : alienBullets) {
+          if (bullet.isActive()) {
+              bullet.draw(g2);
+          }
       }
    }
 

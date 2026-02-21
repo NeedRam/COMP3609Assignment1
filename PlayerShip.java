@@ -1,6 +1,4 @@
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
@@ -19,7 +17,6 @@ public class PlayerShip {
 
    private Rectangle2D.Double ship;
 
-   private Color backgroundColour;
    private Dimension dimension;
 
    private Image shipImage;
@@ -28,7 +25,6 @@ public class PlayerShip {
       panel = p;
       dimension = panel.getSize();
 
-      backgroundColour = panel.getBackground ();
       x = xPos;
       y = yPos;
 
@@ -42,25 +38,8 @@ public class PlayerShip {
    }
 
 
-   public void draw () {
-      Graphics g = panel.getGraphics ();
-      Graphics2D g2 = (Graphics2D) g;
- 
+   public void draw (Graphics2D g2) {
       g2.drawImage(shipImage, x, y, width, height, null);
-
-      g.dispose();
-   }
-
-
-   public void erase () {
-      Graphics g = panel.getGraphics ();
-      Graphics2D g2 = (Graphics2D) g;
-
-      // erase ship by drawing a rectangle on top of it
-      g2.setColor (backgroundColour);
-      g2.fill (new Rectangle2D.Double (x, y, width, height));
-
-      g.dispose();
    }
 
 

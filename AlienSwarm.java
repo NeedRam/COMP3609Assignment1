@@ -15,7 +15,6 @@ public class AlienSwarm extends Thread {
    private int moveDelay;
    private int dropDistance;
 
-   private Color backgroundColour;
    private Dimension dimension;
 
    boolean isRunning;
@@ -23,7 +22,6 @@ public class AlienSwarm extends Thread {
    public AlienSwarm (JPanel p) {
       panel = p;
       dimension = panel.getSize();
-      backgroundColour = panel.getBackground ();
 
       aliens = new ArrayList<Alien>();
       direction = 2;		// start moving right
@@ -64,24 +62,10 @@ public class AlienSwarm extends Thread {
    }
 
 
-   public void drawAll() {
+   public void drawAll(Graphics2D g2) {
       for (Alien alien : aliens) {
-         alien.draw();
+         alien.draw(g2);
       }
-   }
-
-
-   public void eraseAll() {
-      Graphics g = panel.getGraphics ();
-      Graphics2D g2 = (Graphics2D) g;
-
-      g2.setColor (backgroundColour);
-
-      for (Alien alien : aliens) {
-         g2.fill (new Rectangle2D.Double (alien.getX(), alien.getY(), alien.getWidth(), alien.getHeight()));
-      }
-
-      g.dispose();
    }
 
 
@@ -135,9 +119,14 @@ public class AlienSwarm extends Thread {
 
       try {
         while (isRunning) {
-            eraseAll();
-            moveAll();
-            drawAll();
+            // Check if game is paused before moving
+            if (panel instanceof GamePanel) {
+                GamePanel gp = (GamePanel) panel;
+                if (!gp.isGamePaused()) {
+                    moveAll();
+                    gp.repaint();
+                }
+            }
             sleep (moveDelay);
          }
       }
