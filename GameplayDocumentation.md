@@ -12,7 +12,7 @@ This game is based on the classic **Space Invaders** arcade game by **Toshihiro 
 
 The player controls a spaceship at the bottom of the screen, defending Earth from waves of alien invaders. Move left and right using arrow keys to dodge enemy fire and position for shots. Press **SPACE** to fire bullets upward at the descending alien formation.
 
-Aliens move horizontally in formation and slowly descend toward the player. The game features three tiers of aliens with different appearances and point values. Green protective shields provide cover but can be damaged by both player and alien bullets. The game ends when all lives are lost or aliens reach the bottom of the screen.
+Aliens move horizontally in formation and slowly descend toward the player. The game features three tiers of aliens with different appearances and point values. Higher tier aliens (top rows) shoot more frequently than lower tier aliens. The game ends when all lives are lost or aliens reach the bottom of the screen.
 
 ---
 

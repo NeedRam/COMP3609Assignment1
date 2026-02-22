@@ -2,6 +2,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
+import java.util.Random;
 import javax.swing.JPanel;
 
 public class Alien extends Thread {
@@ -15,7 +16,7 @@ public class Alien extends Thread {
    private int height;
 
    private int dx;		// increment to move along x-axis
-   private int dy;		// increment to move along y-axis
+   private int dy;		// increment to move along y-axis when dropping down
 
    private int pointValue;	// points awarded when destroyed
 
@@ -26,8 +27,11 @@ public class Alien extends Thread {
    private Image alienImage;
 
    private int tier;		// alien tier (1, 2, or 3)
+   
+   private int fireChance;	// chance to fire (1 in fireChance per update)
+   private static Random fireRandom = new Random();
 
-   public Alien (JPanel p, int xPos, int yPos, int alienTier) {
+   public Alien (JPanel p, int xPos, int yPos, int alienTier, String spriteName) {
       panel = p;
       dimension = panel.getSize();
 
@@ -36,31 +40,51 @@ public class Alien extends Thread {
 
       tier = alienTier;
 
-      // set dimensions and point value based on tier
+      // set dimensions, point value, and fire chance based on tier
       switch (tier) {
          case 1:
             width = 30;
             height = 30;
             pointValue = 10;
-            alienImage = ImageManager.loadImage("enemyTier1White.png");
+            fireChance = 100;	// Lowest fire chance (1 in 200)
             break;
          case 2:
             width = 35;
             height = 30;
             pointValue = 20;
-            alienImage = ImageManager.loadImage("enemyTier2Gold.png");
+            fireChance = 50;	// Medium fire chance (1 in 100)
             break;
          case 3:
             width = 40;
             height = 30;
             pointValue = 30;
-            alienImage = ImageManager.loadImage("enemyTier3Gold.png");
+            fireChance = 25;	// Highest fire chance (1 in 50)
             break;
          default:
             width = 30;
             height = 30;
             pointValue = 10;
-            alienImage = ImageManager.loadImage("enemyTier1White.png");
+            fireChance = 200;
+      }
+
+      // Load the specified sprite image
+      if (spriteName != null && !spriteName.isEmpty()) {
+         alienImage = ImageManager.loadImage(spriteName);
+      } else {
+         // Fallback to default sprites if none specified
+         switch (tier) {
+            case 1:
+               alienImage = ImageManager.loadImage("enemyTier1White.png");
+               break;
+            case 2:
+               alienImage = ImageManager.loadImage("enemyTier2Gold.png");
+               break;
+            case 3:
+               alienImage = ImageManager.loadImage("enemyTier3Gold.png");
+               break;
+            default:
+               alienImage = ImageManager.loadImage("enemyTier1White.png");
+         }
       }
 
       // flip the image vertically so alien faces downward
@@ -68,6 +92,17 @@ public class Alien extends Thread {
 
       dx = 0;			// movement along x-axis controlled by swarm
       dy = 0;			// movement along y-axis when dropping down
+   }
+
+
+   /**
+    * Attempts to fire a bullet.
+    * Each alien independently rolls its chance to fire.
+    * @return true if this alien should fire this frame, false otherwise
+    */
+   public boolean tryToFire() {
+      // Each alien rolls its own chance to fire
+      return fireRandom.nextInt(fireChance) == 0;
    }
 
 
@@ -149,6 +184,16 @@ public class Alien extends Thread {
 
    public void stopRunning() {
       isRunning = false;
+   }
+
+
+   public int getTier() {
+      return tier;
+   }
+
+
+   public int getFireChance() {
+      return fireChance;
    }
 
 }

@@ -28,7 +28,7 @@ public class PlayerShip {
       x = xPos;
       y = yPos;
 
-      dx = 10;	// make bigger (smaller) to increase (decrease) speed
+      dx = 50;	// make bigger (smaller) to increase (decrease) speed
       dy = 0;	// no movement along y-axis allowed (i.e., move left to right only)
 
       width = 50;

@@ -1,6 +1,7 @@
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -17,15 +18,17 @@ public class GamePanel extends JPanel {
    AlienSwarm alienSwarm;
    ArrayList<Bullet> playerBullets;
    ArrayList<Bullet> alienBullets;
-   ArrayList<Shield> shields;
 
    SoundManager soundManager;
    ScoreManager scoreManager;
 
    private Image backgroundImage;
+   private Image gameOverScreen;
+   private Image spaceBackground;
 
    private boolean gameRunning;
    private boolean gamePaused;
+   private boolean gameOver;
 
    // Key state tracking for smooth movement
    private boolean leftKeyPressed;
@@ -36,18 +39,20 @@ public class GamePanel extends JPanel {
       alienSwarm = null;
       playerBullets = new ArrayList<Bullet>();
       alienBullets = new ArrayList<Bullet>();
-      shields = new ArrayList<Shield>();
 
       soundManager = SoundManager.getInstance();
       scoreManager = ScoreManager.getInstance();
 
       gameRunning = false;
       gamePaused = false;
+      gameOver = false;
 
       leftKeyPressed = false;
       rightKeyPressed = false;
 
-      backgroundImage = ImageManager.loadImage("spaceBackground.jpg");
+      spaceBackground = ImageManager.loadImage("spaceBackground.jpg");
+      gameOverScreen = ImageManager.loadImage("gameOverScreen.png");
+      backgroundImage = spaceBackground;
 
       setBackground(Color.BLACK);
       setDoubleBuffered(true);  // Enable double buffering
@@ -64,16 +69,6 @@ public class GamePanel extends JPanel {
        // Create alien swarm
        alienSwarm = new AlienSwarm(this);
        alienSwarm.createAliens();
-
-       // Create shields
-       shields.clear();
-       int shieldSpacing = size.width / 5;
-       int shieldY = size.height - 120;
-       for (int i = 0; i < 4; i++) {
-          int shieldX = shieldSpacing * (i + 1) - 30;
-          Shield shield = new Shield(this, shieldX, shieldY);
-          shields.add(shield);
-       }
 
        // Clear bullets
        playerBullets.clear();
@@ -125,6 +120,8 @@ public class GamePanel extends JPanel {
 
       gameRunning = true;
       gamePaused = false;
+      gameOver = false;
+      backgroundImage = spaceBackground;
 
       createGameEntities();
       
@@ -135,6 +132,30 @@ public class GamePanel extends JPanel {
       if (alienSwarm != null) {
           alienSwarm.start();
       }
+   }
+
+
+   public void resetGame() {
+      // Stop current game
+      stopGame();
+      
+      // Reset game state
+      gameOver = false;
+      gameRunning = false;
+      gamePaused = false;
+      backgroundImage = spaceBackground;
+      
+      // Reset score manager
+      scoreManager.reset();
+      
+      // Clear all entities
+      playerBullets.clear();
+      alienBullets.clear();
+      player = null;
+      alienSwarm = null;
+      
+      // Start new game
+      startGame();
    }
 
 
@@ -168,6 +189,15 @@ public class GamePanel extends JPanel {
    }
 
 
+   public void triggerGameOver() {
+      gameOver = true;
+      stopGame();
+      backgroundImage = gameOverScreen;
+      soundManager.playClip("gameOver", false);
+      repaint();
+   }
+
+
    public void firePlayerBullet() {
       if (player == null || !gameRunning || gamePaused)
          return;
@@ -184,24 +214,26 @@ public class GamePanel extends JPanel {
    }
 
 
-   public void fireAlienBullet() {
+   /**
+    * Handles alien firing - each alien independently checks if it should fire.
+    * Multiple aliens can fire in a single update cycle.
+    */
+   public void fireAlienBullets() {
       if (alienSwarm == null || !gameRunning || gamePaused)
          return;
 
-      ArrayList<Alien> aliens = alienSwarm.getAliens();
-      if (aliens.isEmpty())
-         return;
+      // Get all aliens that want to fire this frame
+      ArrayList<Alien> firingAliens = alienSwarm.getAliensToFire();
+      
+      // Create a bullet for each alien that wants to fire
+      for (Alien alien : firingAliens) {
+         int bulletX = alien.getX() + alien.getWidth() / 2 - 2;
+         int bulletY = alien.getY() + alien.getHeight();
 
-      // Pick a random alien to fire
-      int index = (int) (Math.random() * aliens.size());
-      Alien alien = aliens.get(index);
-
-      int bulletX = alien.getX() + alien.getWidth() / 2 - 2;
-      int bulletY = alien.getY() + alien.getHeight();
-
-      Bullet bullet = new Bullet(this, bulletX, bulletY, false);
-      alienBullets.add(bullet);
-      bullet.start();
+         Bullet bullet = new Bullet(this, bulletX, bulletY, false);
+         alienBullets.add(bullet);
+         bullet.start();
+      }
    }
 
 
@@ -235,15 +267,6 @@ public class GamePanel extends JPanel {
                    break;
                }
            }
-
-           // Check collision with shields
-           for (Shield shield : shields) {
-               if (shield.checkHit(bulletRect)) {
-                   bullet.setActive(false);
-                   playerBullets.remove(i);
-                   break;
-               }
-           }
        }
 
        // Check alien bullets vs player
@@ -256,27 +279,18 @@ public class GamePanel extends JPanel {
 
            Rectangle2D.Double bulletRect = bullet.getBoundingRectangle();
 
-           // Check collision with player
-           if (player != null && bulletRect.intersects(player.getBoundingRectangle())) {
-               bullet.setActive(false);
-               alienBullets.remove(i);
+            // Check collision with player
+            if (player != null && bulletRect.intersects(player.getBoundingRectangle())) {
+                bullet.setActive(false);
+                alienBullets.remove(i);
 
-               scoreManager.loseLife();
-               soundManager.playClip("playerHit", false);
+                scoreManager.loseLife();
+                soundManager.playRandomPlayerHit();
 
-               if (scoreManager.isGameOver()) {
-                   stopGame();
+                if (scoreManager.isGameOver()) {
+                   triggerGameOver();
                }
                continue;
-           }
-
-           // Check collision with shields
-           for (Shield shield : shields) {
-               if (shield.checkHit(bulletRect)) {
-                   bullet.setActive(false);
-                   alienBullets.remove(i);
-                   break;
-               }
            }
        }
 
@@ -284,7 +298,7 @@ public class GamePanel extends JPanel {
        if (alienSwarm != null && alienSwarm.checkBottomCollision(getHeight())) {
            scoreManager.loseLife();
            if (scoreManager.isGameOver()) {
-               stopGame();
+               triggerGameOver();
            }
            else {
                // Reset level
@@ -314,14 +328,26 @@ public class GamePanel extends JPanel {
           g2.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
       }
 
-      // Draw all game entities on top of background
-      if (!gameRunning) {
+      // Draw game over screen with final score
+      if (gameOver) {
+          // Draw final score in center of screen
+          String finalScoreText = "Final Score: " + scoreManager.getScore();
+          Font scoreFont = new Font("Arial", Font.BOLD, 36);
+          g2.setFont(scoreFont);
+          g2.setColor(Color.WHITE);
+          
+          // Center the text
+          int textWidth = g2.getFontMetrics().stringWidth(finalScoreText);
+          int textX = (getWidth() - textWidth) / 2;
+          int textY = getHeight() / 2 + 100;
+          
+          g2.drawString(finalScoreText, textX, textY);
           return;
       }
 
-      // Draw shields
-      for (Shield shield : shields) {
-          shield.draw(g2);
+      // Draw all game entities on top of background
+      if (!gameRunning) {
+          return;
       }
 
       // Draw player
@@ -357,6 +383,11 @@ public class GamePanel extends JPanel {
 
    public boolean isGamePaused() {
       return gamePaused;
+   }
+
+
+   public boolean isGameOver() {
+      return gameOver;
    }
 
 }

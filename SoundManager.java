@@ -2,9 +2,12 @@ import javax.sound.sampled.AudioInputStream;		// for playing sound clips
 import javax.sound.sampled.*;
 import java.io.*;
 import java.util.HashMap;				// for storing sound clips
+import java.util.Random;				// for random sound selection
 
 public class SoundManager {				// a Singleton class
 	HashMap<String, Clip> clips;
+	private Clip[] playerHitClips;	// array to store player hit sound variations
+	private Random random;			// for random sound selection
 
 	private static SoundManager instance = null;	// keeps track of Singleton instance
 
@@ -12,6 +15,8 @@ public class SoundManager {				// a Singleton class
 
 	private SoundManager () {
 		clips = new HashMap<String, Clip>();
+		random = new Random();
+		playerHitClips = new Clip[3];
 
 		Clip clip = loadClip("backgroundMusic.wav");	// played from start of the game
 		clips.put("background", clip);
@@ -22,8 +27,13 @@ public class SoundManager {				// a Singleton class
 		clip = loadClip("explosionSound.wav");	// played when an alien is destroyed
 		clips.put("explosion", clip);
 
-		clip = loadClip("playerHit1.wav");	// played when the player is hit
-		clips.put("playerHit", clip);
+		// Load all three player hit sounds
+		playerHitClips[0] = loadClip("playerHit1.wav");
+		playerHitClips[1] = loadClip("playerHit2.wav");
+		playerHitClips[2] = loadClip("PlayerHit3.wav");	// Note: capital P
+
+		clip = loadClip("gameOverSound.wav");	// played when the game is over
+		clips.put("gameOver", clip);
 
 		volume = 1.0f;
 	}
@@ -67,6 +77,16 @@ public class SoundManager {				// a Singleton class
 				clip.loop(Clip.LOOP_CONTINUOUSLY);
 			else
 				clip.start();
+		}
+	}
+
+
+	public void playRandomPlayerHit() {
+		int soundChoice = random.nextInt(3);
+		Clip clip = playerHitClips[soundChoice];
+		if (clip != null) {
+			clip.setFramePosition(0);
+			clip.start();
 		}
 	}
 

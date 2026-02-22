@@ -1,7 +1,6 @@
-import javax.swing.*;			// need this for GUI objects
-import java.awt.*;			// need this for Layout Managers
-import java.awt.event.*;		// need this to respond to GUI events
-import javax.swing.Timer;
+import java.awt.*;			// need this for La// need this for GUI objects
+import java.awt.event.*;			// need this for Layout Managers
+import javax.swing.*;		// need this to respond to GUI events
 	
 public class GameWindow extends JFrame 
 				implements ActionListener,
@@ -43,7 +42,7 @@ public class GameWindow extends JFrame
 	public GameWindow() {
  
 		setTitle ("Space Invaders");
-		setSize (600, 650);
+		setSize (800, 650);
 
 		scoreManager = ScoreManager.getInstance();
 		soundManager = SoundManager.getInstance();
@@ -133,7 +132,7 @@ public class GameWindow extends JFrame
 		mainPanel.add(infoPanel);
 		mainPanel.add(gamePanel);
 		mainPanel.add(buttonPanel);
-		mainPanel.setBackground(Color.PINK);
+		mainPanel.setBackground(Color.BLACK);
 
 		// set up mainPanel to respond to keyboard
 
@@ -162,12 +161,12 @@ public class GameWindow extends JFrame
 			}
 		});
 
-		// Create timer for alien firing
-		alienFireTimer = new Timer(2000, new ActionListener() {
+		// Create timer for alien firing - increased fire rate (500ms instead of 2000ms)
+		alienFireTimer = new Timer(500, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (gamePanel.isGameRunning() && !gamePanel.isGamePaused()) {
-					gamePanel.fireAlienBullet();
+					gamePanel.fireAlienBullets();
 				}
 			}
 		});
@@ -191,9 +190,14 @@ public class GameWindow extends JFrame
 		String command = e.getActionCommand();
 
 		if (command.equals(startB.getText())) {
-			scoreManager.reset();
+			// Check if game is over to reset properly
+			if (gamePanel.isGameOver()) {
+				gamePanel.resetGame();
+			} else {
+				scoreManager.reset();
+				gamePanel.startGame();
+			}
 			updateScoreDisplay();
-			gamePanel.startGame();
 			gamePanel.drawGameEntities();
 			gameTimer.start();
 			alienFireTimer.start();
