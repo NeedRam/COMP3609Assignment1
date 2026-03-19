@@ -1,10 +1,10 @@
-import javax.sound.sampled.AudioInputStream;		// for playing sound clips
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.*;
 import java.io.*;
-import java.util.HashMap;				// for storing sound clips
-import java.util.Random;				// for random sound selection
+import java.util.HashMap;
+import java.util.Random;
 
-public class SoundManager {				// a Singleton class
+public class SoundManager {
 	HashMap<String, Clip> clips;
 	private Clip[] playerHitClips;	// array to store player hit sound variations
 	private Random random;			// for random sound selection
@@ -30,7 +30,7 @@ public class SoundManager {				// a Singleton class
 		// Load all three player hit sounds
 		playerHitClips[0] = loadClip("playerHit1.wav");
 		playerHitClips[1] = loadClip("playerHit2.wav");
-		playerHitClips[2] = loadClip("PlayerHit3.wav");	// Note: capital P
+		playerHitClips[2] = loadClip("PlayerHit3.wav");
 
 		clip = loadClip("gameOverSound.wav");	// played when the game is over
 		clips.put("gameOver", clip);
@@ -38,8 +38,7 @@ public class SoundManager {				// a Singleton class
 		volume = 1.0f;
 	}
 
-
-	public static SoundManager getInstance() {	// class method to retrieve instance of Singleton
+	public static SoundManager getInstance() {
 		if (instance == null)
 			instance = new SoundManager();
 		
@@ -62,12 +61,10 @@ public class SoundManager {				// a Singleton class
 		return clip;
 	}
 
-
 	public Clip getClip (String title) {
 
 		return clips.get(title);
 	}
-
 
 	public void playClip(String title, boolean looping) {
 		Clip clip = getClip(title);
@@ -80,7 +77,6 @@ public class SoundManager {				// a Singleton class
 		}
 	}
 
-
 	public void playRandomPlayerHit() {
 		int soundChoice = random.nextInt(3);
 		Clip clip = playerHitClips[soundChoice];
@@ -90,12 +86,10 @@ public class SoundManager {				// a Singleton class
 		}
 	}
 
-
 	public void stopClip(String title) {
 		Clip clip = getClip(title);
 		if (clip != null) {
 			clip.stop();
 		}
 	}
-
 }

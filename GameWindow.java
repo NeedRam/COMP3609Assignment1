@@ -1,26 +1,18 @@
-import java.awt.*;			// need this for La// need this for GUI objects
-import java.awt.event.*;			// need this for Layout Managers
-import javax.swing.*;		// need this to respond to GUI events
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 	
 public class GameWindow extends JFrame 
 				implements ActionListener,
 					   KeyListener
 {
-	// declare instance variables for user interface objects
-
-	// declare labels 
-
 	private JLabel scoreL;
 	private JLabel livesL;
 	private JLabel levelL;
 
-	// declare text fields
-
 	private JTextField scoreTF;
 	private JTextField livesTF;
 	private JTextField levelTF;
-
-	// declare buttons
 
 	private JButton startB;
 	private JButton pauseB;
@@ -81,7 +73,6 @@ public class GameWindow extends JFrame
 		pauseB.addActionListener(this);
 		exitB.addActionListener(this);
 
-		
 		// create mainPanel
 
 		mainPanel = new JPanel();
@@ -94,7 +85,6 @@ public class GameWindow extends JFrame
 
 		gamePanel = new GamePanel();
         	gamePanel.setPreferredSize(new Dimension(580, 500));
-
 
 		// create infoPanel
 
@@ -114,7 +104,6 @@ public class GameWindow extends JFrame
 		infoPanel.add (levelL);
 		infoPanel.add (levelTF);
 
-		
 		// create buttonPanel
 
 		JPanel buttonPanel = new JPanel();
@@ -182,9 +171,6 @@ public class GameWindow extends JFrame
 		});
 	}
 
-
-	// implement single method in ActionListener interface
-
 	public void actionPerformed(ActionEvent e) {
 
 		String command = e.getActionCommand();
@@ -228,9 +214,6 @@ public class GameWindow extends JFrame
 		mainPanel.requestFocus();
 	}
 
-
-	// implement methods in KeyListener interface
-
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
 
@@ -260,14 +243,11 @@ public class GameWindow extends JFrame
 	}
 
 	public void keyTyped(KeyEvent e) {
-
 	}
-
 
 	private void updateScoreDisplay() {
 		scoreTF.setText(String.valueOf(scoreManager.getScore()));
 		livesTF.setText(String.valueOf(scoreManager.getLives()));
 		levelTF.setText(String.valueOf(scoreManager.getLevel()));
 	}
-
 }

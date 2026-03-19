@@ -32,19 +32,13 @@ public class AlienSwarm extends Thread {
       dimension = panel.getSize();
 
       aliens = new ArrayList<Alien>();
-      direction = 2;		// start moving right
+      direction = 2;		   // start moving right
       moveDelay = 200;		// milliseconds between moves
       dropDistance = 20;
       random = new Random();
    }
 
-
-   /**
-    * Creates a 3-row formation of aliens:
-    * Row 0 (top): Tier 3 ships (30 points) - highest fire chance
-    * Row 1 (middle): Tier 2 ships (20 points) - medium fire chance
-    * Row 2 (bottom): Tier 1 ships (10 points) - lowest fire chance
-    */
+   // Creates a 3-row formation of aliens:
    public void createAliens() {
       int startX = 30;
       int startY = 50;
@@ -52,13 +46,9 @@ public class AlienSwarm extends Thread {
       int spacingY = 40;
       int shipsPerRow = 10;
 
-      // Create 3 rows of aliens
       for (int row = 0; row < 3; row++) {
          int tier;
          String[] sprites;
-         
-          // Determine tier based on row
-          // Row 0 (top, smallest y) = Tier 3, Row 1 (middle) = Tier 2, Row 2 (bottom, largest y) = Tier 1
           switch (row) {
              case 0:  // Row 0: Top row (smallest y, farthest from player)
                 tier = 3;
@@ -88,13 +78,11 @@ public class AlienSwarm extends Thread {
       }
    }
 
-
    public void drawAll(Graphics2D g2) {
       for (Alien alien : aliens) {
          alien.draw(g2);
       }
    }
-
 
    public void moveAll() {
       if (!panel.isVisible ()) return;
@@ -140,7 +128,6 @@ public class AlienSwarm extends Thread {
       }
    }
 
-
    public void run () {
       isRunning = true;
 
@@ -160,21 +147,17 @@ public class AlienSwarm extends Thread {
       catch(InterruptedException e) {}
    }
 
-
    public ArrayList<Alien> getAliens() {
       return aliens;
    }
-
 
    public void removeAlien(Alien alien) {
       aliens.remove(alien);
    }
 
-
    public boolean isEmpty() {
       return aliens.isEmpty();
    }
-
 
    public void stopRunning() {
       isRunning = false;
@@ -182,7 +165,6 @@ public class AlienSwarm extends Thread {
          alien.stopRunning();
       }
    }
-
 
    public boolean checkBottomCollision(int panelHeight) {
       for (Alien alien : aliens) {
@@ -193,10 +175,9 @@ public class AlienSwarm extends Thread {
       return false;
    }
 
-
    /**
-    * Gets all aliens that want to fire this frame.
-    * Each alien independently rolls its own chance to fire.
+    * Gets all aliens that want to fire this frame
+    * Each alien independently rolls its own chance to fire
     * @return ArrayList of aliens that should fire this frame
     */
    public ArrayList<Alien> getAliensToFire() {

@@ -46,19 +46,19 @@ public class Alien extends Thread {
             width = 30;
             height = 30;
             pointValue = 10;
-            fireChance = 100;	// Lowest fire chance (1 in 200)
+            fireChance = 100;	// Lowest fire chance (1 in 100)
             break;
          case 2:
             width = 35;
             height = 30;
             pointValue = 20;
-            fireChance = 50;	// Medium fire chance (1 in 100)
+            fireChance = 50;	// Medium fire chance (1 in 50)
             break;
          case 3:
             width = 40;
             height = 30;
             pointValue = 30;
-            fireChance = 25;	// Highest fire chance (1 in 50)
+            fireChance = 25;	// Highest fire chance (1 in 25)
             break;
          default:
             width = 30;
@@ -94,22 +94,15 @@ public class Alien extends Thread {
       dy = 0;			// movement along y-axis when dropping down
    }
 
-
-   /**
-    * Attempts to fire a bullet.
-    * Each alien independently rolls its chance to fire.
-    * @return true if this alien should fire this frame, false otherwise
-    */
+   // Attempts to fire a bullet.
+   // Each alien independently rolls its chance to fire.
    public boolean tryToFire() {
-      // Each alien rolls its own chance to fire
       return fireRandom.nextInt(fireChance) == 0;
    }
-
 
    public void draw (Graphics2D g2) {
       g2.drawImage(alienImage, x, y, width, height, null);
    }
-
 
    public void move(int direction, boolean dropDown) {
       if (!panel.isVisible ()) return;
@@ -126,74 +119,59 @@ public class Alien extends Thread {
       }
    }
 
-
+   // The actual movement is controlled by AlienSwarm
+   // This thread just handles the drawing loop
    public void run () {
       isRunning = true;
-
-      // The actual movement is controlled by AlienSwarm
-      // This thread just handles the drawing loop
       try {
         while (isRunning) {
-            // Drawing is handled by the swarm
             sleep (50);
          }
       }
       catch(InterruptedException e) {}
    }
 
-
    public Rectangle2D.Double getBoundingRectangle() {
       return new Rectangle2D.Double (x, y, width, height);
    }
-
 
    public int getPointValue() {
       return pointValue;
    }
 
-
    public int getX() {
       return x;
    }
-
 
    public int getY() {
       return y;
    }
 
-
    public int getWidth() {
       return width;
    }
-
 
    public int getHeight() {
       return height;
    }
 
-
    public void setX(int newX) {
       x = newX;
    }
-
 
    public void setY(int newY) {
       y = newY;
    }
 
-
    public void stopRunning() {
       isRunning = false;
    }
-
 
    public int getTier() {
       return tier;
    }
 
-
    public int getFireChance() {
       return fireChance;
    }
-
 }

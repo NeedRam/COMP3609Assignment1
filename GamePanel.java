@@ -8,9 +8,6 @@ import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
-/**
-   A component that displays all the game entities
- */
 
 public class GamePanel extends JPanel {
    
@@ -58,7 +55,6 @@ public class GamePanel extends JPanel {
       setDoubleBuffered(true);  // Enable double buffering
    }
 
-
    public void createGameEntities() {
        // Create player ship at bottom center
        Dimension size = getSize();
@@ -75,12 +71,10 @@ public class GamePanel extends JPanel {
        alienBullets.clear();
    }
 
-
    public void drawGameEntities() {
         // With double-buffering, we just request a repaint
         repaint();
     }
-
 
     public void updateGameEntities(int direction) {
         if (player == null)
@@ -89,7 +83,6 @@ public class GamePanel extends JPanel {
         player.move(direction);
         repaint();
     }
-
 
     public void updatePlayerMovement() {
         if (player == null || !gameRunning || gamePaused)
@@ -103,16 +96,13 @@ public class GamePanel extends JPanel {
         }
     }
 
-
     public void setLeftKeyPressed(boolean pressed) {
         leftKeyPressed = pressed;
     }
 
-
     public void setRightKeyPressed(boolean pressed) {
         rightKeyPressed = pressed;
     }
-
 
    public void startGame() {
       if (gameRunning)
@@ -133,7 +123,6 @@ public class GamePanel extends JPanel {
           alienSwarm.start();
       }
    }
-
 
    public void resetGame() {
       // Stop current game
@@ -158,7 +147,6 @@ public class GamePanel extends JPanel {
       startGame();
    }
 
-
    public void pauseGame() {
       gamePaused = !gamePaused;
       
@@ -169,7 +157,6 @@ public class GamePanel extends JPanel {
          soundManager.playClip("background", true);
       }
    }
-
 
    public void stopGame() {
       gameRunning = false;
@@ -188,7 +175,6 @@ public class GamePanel extends JPanel {
       }
    }
 
-
    public void triggerGameOver() {
       gameOver = true;
       stopGame();
@@ -196,7 +182,6 @@ public class GamePanel extends JPanel {
       soundManager.playClip("gameOver", false);
       repaint();
    }
-
 
    public void firePlayerBullet() {
       if (player == null || !gameRunning || gamePaused)
@@ -213,11 +198,8 @@ public class GamePanel extends JPanel {
       soundManager.playClip("shoot", false);
    }
 
-
-   /**
-    * Handles alien firing - each alien independently checks if it should fire.
-    * Multiple aliens can fire in a single update cycle.
-    */
+   // Handles alien firing - each alien independently checks if it should fire
+   // Multiple aliens can fire in a single update cycle
    public void fireAlienBullets() {
       if (alienSwarm == null || !gameRunning || gamePaused)
          return;
@@ -235,7 +217,6 @@ public class GamePanel extends JPanel {
          bullet.start();
       }
    }
-
 
    public void checkCollisions() {
        if (!gameRunning || gamePaused)
@@ -317,7 +298,6 @@ public class GamePanel extends JPanel {
        }
     }
 
-
    @Override
    protected void paintComponent(Graphics g) {
       super.paintComponent(g);
@@ -328,9 +308,8 @@ public class GamePanel extends JPanel {
           g2.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
       }
 
-      // Draw game over screen with final score
+      // Draw game over screen with final score in center of screen
       if (gameOver) {
-          // Draw final score in center of screen
           String finalScoreText = "Final Score: " + scoreManager.getScore();
           Font scoreFont = new Font("Arial", Font.BOLD, 36);
           g2.setFont(scoreFont);
@@ -345,7 +324,6 @@ public class GamePanel extends JPanel {
           return;
       }
 
-      // Draw all game entities on top of background
       if (!gameRunning) {
           return;
       }
@@ -375,19 +353,15 @@ public class GamePanel extends JPanel {
       }
    }
 
-
    public boolean isGameRunning() {
       return gameRunning;
    }
-
 
    public boolean isGamePaused() {
       return gamePaused;
    }
 
-
    public boolean isGameOver() {
       return gameOver;
    }
-
 }

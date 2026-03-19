@@ -42,7 +42,6 @@ public class Bullet extends Thread {
       }
    }
 
-
    public void draw (Graphics2D g2) {
       // draw bullet as a yellow rectangle
       g2.setColor(Color.YELLOW);
@@ -50,13 +49,11 @@ public class Bullet extends Thread {
       g2.fill(bullet);
    }
 
-
    public void move() {
       if (!panel.isVisible ()) return;
 
       y = y + dy;
    }
-
 
    public void run () {
       isRunning = true;
@@ -86,16 +83,13 @@ public class Bullet extends Thread {
       return new Rectangle2D.Double (x, y, width, height);
    }
 
-
    public boolean isActive() {
       return isActive;
    }
 
-
    public void setActive(boolean active) {
       isActive = active;
    }
-
 
    public boolean isPlayerBullet() {
       return isPlayerBullet;
@@ -106,5 +100,4 @@ public class Bullet extends Thread {
    public void stopRunning() {
       isRunning = false;
    }
-
 }

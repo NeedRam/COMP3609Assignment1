@@ -28,8 +28,8 @@ public class PlayerShip {
       x = xPos;
       y = yPos;
 
-      dx = 50;	// make bigger (smaller) to increase (decrease) speed
-      dy = 0;	// no movement along y-axis allowed (i.e., move left to right only)
+      dx = 50;	// horizontal movement speed
+      dy = 0;	// no movement along y axis
 
       width = 50;
       height = 30;
@@ -37,11 +37,9 @@ public class PlayerShip {
       shipImage = ImageManager.loadImage("playerShip.png");
    }
 
-
    public void draw (Graphics2D g2) {
       g2.drawImage(shipImage, x, y, width, height, null);
    }
-
 
    public void move (int direction) {
 
@@ -62,29 +60,23 @@ public class PlayerShip {
       }
    }
 
-
    public Rectangle2D.Double getBoundingRectangle() {
       return new Rectangle2D.Double (x, y, width, height);
    }
-
 
    public int getX() {
       return x;
    }
 
-
    public int getY() {
       return y;
    }
-
 
    public int getWidth() {
       return width;
    }
 
-
    public int getHeight() {
       return height;
    }
-
 }

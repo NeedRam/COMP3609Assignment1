@@ -1,4 +1,4 @@
-public class ScoreManager {		// a Singleton class
+public class ScoreManager {
 
    private static ScoreManager instance = null;	// keeps track of Singleton instance
 
@@ -14,7 +14,6 @@ public class ScoreManager {		// a Singleton class
       highScore = 0;
    }
 
-
    public static ScoreManager getInstance() {	// class method to retrieve instance of Singleton
       if (instance == null)
          instance = new ScoreManager();
@@ -22,16 +21,12 @@ public class ScoreManager {		// a Singleton class
       return instance;
    }
 
-
    public void addScore (int points) {
       score = score + points;
-      
-      // Update high score if current score is higher
       if (score > highScore) {
          highScore = score;
       }
    }
-
 
    public void loseLife () {
       lives = lives - 1;
@@ -40,11 +35,9 @@ public class ScoreManager {		// a Singleton class
       }
    }
 
-
    public void nextLevel () {
       level = level + 1;
    }
-
 
    public void reset () {
       score = 0;
@@ -52,44 +45,35 @@ public class ScoreManager {		// a Singleton class
       level = 1;
    }
 
-
    public int getScore () {
       return score;
    }
-
 
    public int getLives () {
       return lives;
    }
 
-
    public int getLevel () {
       return level;
    }
-
 
    public int getHighScore () {
       return highScore;
    }
 
-
    public void setScore (int newScore) {
       score = newScore;
    }
-
 
    public void setLives (int newLives) {
       lives = newLives;
    }
 
-
    public void setLevel (int newLevel) {
       level = newLevel;
    }
 
-
    public boolean isGameOver () {
       return lives <= 0;
    }
-
 }

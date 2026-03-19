@@ -6,5 +6,4 @@ public class GameApplication
 
 		JFrame gameWindow = new GameWindow();
 	}
-
 }

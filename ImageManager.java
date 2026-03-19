@@ -1,18 +1,14 @@
-import javax.swing.ImageIcon;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics2D;
+import javax.swing.ImageIcon;
 
-/**
-   The ImageManager class manages the loading and processing of images.
-*/
 
 public class ImageManager {
       
    	public ImageManager () {
-
 	}
 
 	public static Image loadImage (String fileName) {
@@ -20,7 +16,7 @@ public class ImageManager {
 	}
 
 	/**
-	 * Converts an Image to a BufferedImage.
+	 * Converts an Image to a BufferedImage
 	 * @param image The Image to convert
 	 * @return A BufferedImage representation of the image
 	 */
@@ -45,10 +41,8 @@ public class ImageManager {
 	}
 
 	/**
-	 * Flips an image vertically (upside down).
-	 * Used to flip enemy ship images for the alien invaders.
-	 * @param image The image to flip
-	 * @return A new Image that is flipped vertically
+	 * Flips an image vertically (upside down)
+	 * Used to flip enemy ship images for the alien invaders
 	 */
 	public static Image flipImageVertically(Image image) {
 		BufferedImage buffered = toBufferedImage(image);
